@@ -13,9 +13,8 @@ class ConfidentialUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # These fields will store ENCRYPTED strings
     name = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(255), nullable=False)
-    age = db.Column(db.String(255), nullable=False)
-    phone = db.Column(db.String(255), nullable=False)
+    username = db.Column(db.String(255), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -39,7 +39,8 @@ def index():
         display_users.append({
             "id": u.id,
             "name": decrypt_data(u.name) if SECURITY_SETTINGS["encryption_enabled"] else u.name,
-            "email": decrypt_data(u.email) if SECURITY_SETTINGS["encryption_enabled"] else u.email,
+            "username": decrypt_data(u.username) if SECURITY_SETTINGS["encryption_enabled"] else u.username,
+            "password": decrypt_data(u.password) if SECURITY_SETTINGS["encryption_enabled"] else u.password,
             "encrypted_name_demo": u.name # Keep raw version for side-by-side comparison
         })
     
@@ -102,24 +103,22 @@ def logout():
 @app.route('/add_user', methods=['POST'])
 def add_user():
     name = request.form.get('name')
-    email = request.form.get('email')
-    age = request.form.get('age')
-    phone = request.form.get('phone')
+    username = request.form.get('username')
+    password = request.form.get('password')
 
     if SECURITY_SETTINGS["encryption_enabled"]:
         new_user = ConfidentialUser(
             name=encrypt_data(name),
-            email=encrypt_data(email),
-            age=encrypt_data(age),
-            phone=encrypt_data(phone)
+            username=encrypt_data(username),
+            password=encrypt_data(password)
         )
     else:
         # VULNERABLE MODE: Store in plain text
-        new_user = ConfidentialUser(name=name, email=email, age=age, phone=phone)
+        new_user = ConfidentialUser(name=name, username=username, password=password)
     
     db.session.add(new_user)
     db.session.commit()
-    log_event(f"ADDED_USER: {name}")
+    log_event(f"ADDED_USER: {username}")
     return redirect(url_for('index'))
 
 @app.route('/toggle_security/<feature>')
