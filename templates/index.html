@@ -2,108 +2,168 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>The Vault - Cyber Security Lab</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Vault | Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
-        .security-badge { font-size: 0.8rem; }
-        .log-entry { font-family: monospace; font-size: 0.9rem; }
-        .confidential { color: #dc3545; font-weight: bold; }
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(15, 23, 42, 0.8) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            color: var(--text-main);
+        }
+        .table { color: var(--text-main); border-color: rgba(255, 255, 255, 0.05); }
+        .table thead th { border-bottom: 2px solid rgba(255, 255, 255, 0.1); color: var(--text-dim); }
+        .btn-action {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            transition: all 0.2s;
+        }
+        .btn-action:hover {
+            background: var(--accent);
+            color: var(--bg-dark);
+        }
+        .security-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .list-group-item {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            padding: 1rem;
+        }
+        .log-entry { font-family: 'Fira Code', monospace; font-size: 0.8rem; }
+        .input-dark {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .input-dark:focus { background: rgba(15, 23, 42, 0.8); color: white; border-color: var(--accent); }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">🔒 The Vault: Security Laboratory</a>
-            <div>
-                {% if logged_in %}
-                    <span class="text-light me-3">Welcome, <strong>{{ logged_in }}</strong></span>
-                    <a href="/logout" class="btn btn-sm btn-outline-light me-2">Logout</a>
-                {% else %}
-                    <a href="/login" class="btn btn-sm btn-light me-2">Login</a>
-                {% endif %}
-                <span class="badge {% if security.encryption_enabled %}bg-success{% else %}bg-danger{% endif %} me-2">
-                    Encryption: {{ "ON" if security.encryption_enabled else "OFF" }}
-                </span>
+    <nav class="navbar navbar-dark sticky-top">
+        <div class="container py-1">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-vault me-2 text-info"></i>THE VAULT
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="text-dim small me-3"><i class="fas fa-user-shield me-1"></i> {{ logged_in or "Guest" }}</span>
+                <a href="/logout" class="btn btn-sm btn-outline-danger border-0"><i class="fas fa-sign-out-alt"></i></a>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-5">
         <div class="row">
-            <!-- Attack/Defense Control Panel -->
-            <div class="col-md-4">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">Lab Controls</div>
-                    <div class="card-body">
-                        <h6>Security Toggles</h6>
-                        <div class="list-group mb-3">
-                            <a href="/toggle_security/encryption_enabled" class="list-group-item list-group-item-action d-flex justify-content-between">
-                                Data Encryption <span>{{ "✅" if security.encryption_enabled else "❌" }}</span>
-                            </a>
-                            <a href="/toggle_security/secure_login" class="list-group-item list-group-item-action d-flex justify-content-between">
-                                Parameterized Queries<span>{{ "✅" if security.secure_login else "❌" }}</span>
-                            </a>
-                            <a href="/toggle_security/audit_logging" class="list-group-item list-group-item-action d-flex justify-content-between">
-                                Audit Logs <span>{{ "✅" if security.audit_logging else "❌" }}</span>
-                            </a>
-                        </div>
-                        
-                        <hr>
-                        <h6>Demo Attack</h6>
-                        <button class="btn btn-outline-danger w-100 mb-2" onclick="alert('Attempting to read SQL file directly...')">Download DB (Direct Access)</button>
-                        <p class="small text-muted">If Encryption is OFF, your Name/Email will be visible in the .sqlite file.</p>
+            <!-- Sidebar Controls -->
+            <div class="col-lg-4">
+                <div class="card shadow-lg mb-4 p-3">
+                    <h5 class="mb-4 d-flex justify-content-between align-items-center">
+                        Lab Environment
+                        <span class="badge bg-info bg-opacity-10 text-info">v2.0</span>
+                    </h5>
+                    
+                    <div class="list-group list-group-flush rounded-3 border">
+                        <a href="/toggle_security/encryption_enabled" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-microchip me-2 text-dim"></i> Hardware Encryption
+                                <div class="small text-dim mt-1">AES-256 Storage layer</div>
+                            </div>
+                            <i class="fas {{ 'fa-toggle-on text-success' if security.encryption_enabled else 'fa-toggle-off text-secondary' }} fa-lg"></i>
+                        </a>
+                        <a href="/toggle_security/secure_login" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-shield-halved me-2 text-dim"></i> SQL Protection
+                                <div class="small text-dim mt-1">Parameterized Queries</div>
+                            </div>
+                            <i class="fas {{ 'fa-toggle-on text-success' if security.secure_login else 'fa-toggle-off text-secondary' }} fa-lg"></i>
+                        </a>
+                        <a href="/toggle_security/audit_logging" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-receipt me-2 text-dim"></i> Audit Logging
+                                <div class="small text-dim mt-1">Immutable Event Logs</div>
+                            </div>
+                            <i class="fas {{ 'fa-toggle-on text-success' if security.audit_logging else 'fa-toggle-off text-secondary' }} fa-lg"></i>
+                        </a>
                     </div>
                 </div>
 
-                <div class="card shadow-sm">
-                    <div class="card-header bg-secondary text-white">Add Confidential Record</div>
-                    <div class="card-body">
-                        <form action="/add_user" method="POST">
-                            <input type="text" name="name" class="form-control mb-2" placeholder="Full Name" required>
-                            <input type="email" name="email" class="form-control mb-2" placeholder="Email Address" required>
-                            <input type="number" name="age" class="form-control mb-2" placeholder="Age" required>
-                            <input type="text" name="phone" class="form-control mb-2" placeholder="Phone Number" required>
-                            <button type="submit" class="btn btn-success w-100">Store Securely</button>
-                        </form>
-                    </div>
+                <div class="card shadow-lg p-3">
+                    <h6 class="text-dim text-uppercase mb-3">Add Security Record</h6>
+                    <form action="/add_user" method="POST">
+                        <input type="text" name="name" class="form-control input-dark mb-2" placeholder="Full Name" required>
+                        <input type="email" name="email" class="form-control input-dark mb-2" placeholder="Email" required>
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <input type="number" name="age" class="form-control input-dark mb-2" placeholder="Age" required>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" name="phone" class="form-control input-dark mb-2" placeholder="Phone" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-action w-100 mt-2 fw-bold">COMMIT TO VAULT</button>
+                    </form>
                 </div>
             </div>
 
-            <!-- Data Display -->
-            <div class="col-md-8">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                        <span>Confidential User Records</span>
-                        <span class="text-warning small text-uppercase">Encrypted Tables</span>
+            <!-- Content Area -->
+            <div class="col-lg-8">
+                <div class="card shadow-lg mb-4 overflow-hidden">
+                    <div class="card-header bg-transparent border-bottom-0 py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-database me-2 text-accent"></i>Vault Registry</h5>
+                        <a href="/login" class="btn btn-sm btn-link text-dim text-decoration-none small">Switch to Login Lab</a>
                     </div>
-                    <div class="card-body">
-                        <table class="table table-hover">
-                            <thead>
+                    <div class="p-0">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-black bg-opacity-25">
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Real Data <small class="text-muted">(What User Sees)</small></th>
-                                    <th class="bg-warning-subtle text-dark">DB Storage <small>(Confidential Mode)</small></th>
+                                    <th class="ps-4">Identifier</th>
+                                    <th>Exposure Layer</th>
+                                    <th>Security Level</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for user in users %}
-                                <tr>
-                                    <td>{{ user.id }}</td>
-                                    <td>
-                                        <div class="small"><strong>Name:</strong> {{ user.name }}</div>
-                                        <div class="small"><strong>Email:</strong> {{ user.email }}</div>
+                                <tr class="align-middle">
+                                    <td class="ps-4">
+                                        <div class="fw-bold">{{ user.name }}</div>
+                                        <div class="small text-dim">{{ user.email }}</div>
                                     </td>
-                                    <td class="bg-light">
-                                        <div style="max-height: 100px; overflow-y: auto;">
-                                            {% if security.encryption_enabled %}
-                                                <code class="text-break d-block small">{{ user.encrypted_name_demo }}</code>
-                                                <span class="badge bg-success security-badge mt-1">AES-256 Encrypted</span>
-                                            {% else %}
-                                                <code class="text-dark">{{ user.name }}</code>
-                                                <span class="badge bg-danger security-badge mt-1">Plain Text (Vulnerable)</span>
-                                            {% endif %}
-                                        </div>
+                                    <td>
+                                        {% if security.encryption_enabled %}
+                                            <code class="small text-info opacity-50">{{ user.encrypted_name_demo[:15] }}...</code>
+                                        {% else %}
+                                            <span class="text-danger small"><i class="fas fa-warning me-1"></i> Raw Plaintext</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="security-status {{ 'bg-success bg-opacity-10 text-success' if security.encryption_enabled else 'bg-danger bg-opacity-10 text-danger' }}">
+                                            {{ "ENCRYPTED" if security.encryption_enabled else "UNSECURED" }}
+                                        </span>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -112,26 +172,21 @@
                     </div>
                 </div>
 
-                <!-- Audit Logs -->
-                <div class="card shadow-sm">
-                    <div class="card-header bg-dark text-white">Security Audit Trail (Confidential Logs)</div>
-                    <div class="card-body p-0">
-                        <ul class="list-group list-group-flush">
-                            {% for log in logs %}
-                            <li class="list-group-item log-entry">
-                                <small class="text-muted">[{{ log.timestamp.strftime('%H:%M:%S') }}]</small>
-                                <strong>{{ log.action }}</strong> 
-                                <span class="badge bg-light text-dark border ms-2">User: {{ log.user_identity[:20] }}...</span>
-                                <span class="badge bg-info float-end">{{ log.status }}</span>
-                            </li>
-                            {% endfor %}
-                        </ul>
+                <div class="card shadow-lg p-3 bg-black bg-opacity-20">
+                    <h6 class="text-dim mb-3"><i class="fas fa-terminal me-2"></i>Security Audit Trail</h6>
+                    <div class="log-container" style="max-height: 200px; overflow-y: auto;">
+                        {% for log in logs %}
+                        <div class="log-entry mb-1">
+                            <span class="text-dim">[{{ log.timestamp.strftime('%H:%M:%S') }}]</span>
+                            <span class="text-{{ 'success' if log.status == 'SUCCESS' else 'danger' }} fw-bold">{{ log.action }}</span>
+                            <span class="text-dim opacity-50">-> (ID: {{ log.user_identity[:12] }}...)</span>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

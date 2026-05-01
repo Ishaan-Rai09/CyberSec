@@ -63,14 +63,25 @@ def login():
             # This allows ' OR '1'='1 handles
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
+            # USE COMMENT to ignore password check: ' OR '1'='1' --
             query = f"SELECT * FROM user WHERE username = '{username}' AND password = '{password}'"
             print(f"Executing Vulnerable Query: {query}")
-            cursor.execute(query)
-            user_row = cursor.fetchone()
+            try:
+                cursor.executescript(query) # executescript can handle multiple statements but we want results
+                # Actually, standard execute is fine, but SQLi often needs to bypass the AND password part
+                cursor.execute(query)
+                user_row = cursor.fetchone()
+            except Exception as e:
+                print(f"SQL Error: {e}")
+                user_row = None
             conn.close()
             
             # Map row to something we can use if found
-            user = {"username": user_row[1], "id": user_row[0]} if user_row else None
+            # sqlite3 fetchone returns a tuple. Table structure is likely (id, username, password)
+            if user_row:
+                user = {"username": user_row[1], "id": user_row[0]}
+            else:
+                user = None
 
         if user:
             session['user_id'] = user['username'] if isinstance(user, dict) else user.username
