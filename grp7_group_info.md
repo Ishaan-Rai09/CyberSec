@@ -27,9 +27,9 @@
 
 | Field             | Details                        |
 |-------------------|--------------------------------|
-| **Full Name**     | Ishaan Rai                     |
-| **Roll Number**   | [2310991933]                   |
-| **GitHub Profile**| @Ishaan-Rai09                  |
+| **Full Name**     | Jyoti Dhamija                    |
+| **Roll Number**   | [2310991944]                   |
+| **GitHub Profile**| @Jyotiiiiiiiii                  |
 | **Contribution**  | Implemented the SQL Injection (SQLi) f-string vulnerability and the corresponding Parameterized Query secure patch. |
 
 ---
@@ -60,9 +60,9 @@
 
 | Field             | Details                        |
 |-------------------|--------------------------------|
-| **Full Name**     | Jyoti Dhamija                  |
-| **Roll Number**   | [2310991944]                   |
-| **GitHub Profile**| @[Jyotiiiiiiiii]               |
+| **Full Name**     | Ishaan Rai                     |
+| **Roll Number**   | [2310991933]                   |
+| **GitHub Profile**| @[Ishaan-Rai09]                |
 | **Contribution**  | Created the Cybersecurity Lab Guide tutorial system and the reactive security status badges for the dashboard. |
 
 ---
