@@ -20,8 +20,10 @@ SECURITY_SETTINGS = {
 
 def log_event(action, user_id=None, status="SUCCESS"):
     if SECURITY_SETTINGS["audit_logging"]:
-        eid = encrypt_data(str(user_id)) if user_id else "ANONYMOUS"
-        new_log = AuditLog(action=action, user_identity=eid, status=status)
+        # Primary fix: Always seek the session username if user_id is missing
+        actual_user = user_id or session.get('user_id') or "admin"
+        
+        new_log = AuditLog(action=action, user_identity=str(actual_user), status=status)
         db.session.add(new_log)
         db.session.commit()
 
@@ -87,11 +89,11 @@ def login():
         if user:
             session['user_id'] = user['username'] if isinstance(user, dict) else user.username
             flash(f"Logged in successfully as {session['user_id']}!")
-            log_event(f"LOGIN: {session['user_id']}")
+            log_event(f"LOGIN: {session['user_id']}", user_id=session['user_id'])
             return redirect(url_for('index'))
         else:
             flash("Invalid credentials.")
-            log_event(f"FAILED_LOGIN: {username}", status="FAILURE")
+            log_event(f"FAILED_LOGIN: {username}", user_id=username, status="FAILURE")
             
     return render_template('login.html', security=SECURITY_SETTINGS)
 
@@ -118,14 +120,14 @@ def add_user():
     
     db.session.add(new_user)
     db.session.commit()
-    log_event(f"ADDED_USER: {username}")
+    log_event(f"ADDED_USER: {username}", user_id=session.get('user_id'))
     return redirect(url_for('index'))
 
 @app.route('/toggle_security/<feature>')
 def toggle_security(feature):
     if feature in SECURITY_SETTINGS:
         SECURITY_SETTINGS[feature] = not SECURITY_SETTINGS[feature]
-        log_event(f"SECURITY_TOGGLE: {feature} to {SECURITY_SETTINGS[feature]}")
+        log_event(f"SECURITY_TOGGLE: {feature} to {SECURITY_SETTINGS[feature]}", user_id=session.get('user_id'))
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
