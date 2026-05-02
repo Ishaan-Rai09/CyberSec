@@ -38,9 +38,9 @@
 
 | Field             | Details                        |
 |-------------------|--------------------------------|
-| **Full Name**     | Kartik                    |
-| **Roll Number**   | [Roll Number]                  |
-| **GitHub Profile**| @[GitHub Handle]               |
+| **Full Name**     | Kartik Nanda                   |
+| **Roll Number**   | [2310991948]                   |
+| **GitHub Profile**| @ Kartik941                    |
 | **Contribution**  | Designed the AES-256-CFB Encryption Engine (using PyCryptodome) and integrated the data-at-rest protection logic. |
 
 ---
@@ -49,10 +49,10 @@
 
 | Field             | Details                        |
 |-------------------|--------------------------------|
-| **Full Name**     | [Name Here]                    |
-| **Roll Number**   | [Roll Number]                  |
-| **GitHub Profile**| @[GitHub Handle]               |
-| **Contribution**  | Developed the real-time Password Strength Meter with regex validation and the frontend forensic audit trail UI. |
+| **Full Name**     | Khushi Panwar                  |
+| **Roll Number**   | [2310991956]                   |
+| **GitHub Profile**| @[Khushipanwar16]              |
+| **Contribution**  | Developed the real-time Password Strength Meter with regex validation.                                    |
 
 ---
 
@@ -71,9 +71,9 @@
 
 | Field             | Details                        |
 |-------------------|--------------------------------|
-| **Full Name**     | [Name Here]                    |
-| **Roll Number**   | [Roll Number]                  |
-| **GitHub Profile**| @[GitHub Handle]               |
+| **Full Name**     | [Krishiv]                      |
+| **Roll Number**   | [2310991961]                   |
+| **GitHub Profile**| @[Krishivdawra]                |
 | **Contribution**  | Managed the SQLite database schema design and implemented the AuditLog persistence and data retrieval logic. |
 
 ---
