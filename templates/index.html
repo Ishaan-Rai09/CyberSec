@@ -71,7 +71,14 @@
             color: var(--text-main);
         }
         .input-light:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
-        .strength-meter { height: 4px; border-radius: 2px; transition: all 0.3s; margin-top: 5px; }
+        #password-strength-meter { 
+            height: 4px; 
+            border-radius: 2px; 
+            transition: all 0.3s; 
+            margin-top: 5px; 
+            background-color: #e2e8f0; /* Default background */
+            width: 0%;
+        }
         .animate-pulse {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
@@ -173,15 +180,35 @@
 
                 <div class="card p-3">
                     <h6 class="text-dim text-uppercase mb-3 small fw-bold">Target Data Entry</h6>
-                    <form action="/add_user" method="POST">
+                    <form action="/add_user" method="POST" id="vault-form">
                         <input type="text" name="name" class="form-control input-light mb-2" placeholder="Full Name" required>
                         <input type="text" name="username" class="form-control input-light mb-2" placeholder="Username" required>
-                        <div class="mb-2">
-                            <input type="password" name="password" id="id_password" class="form-control input-light" placeholder="Password" required>
-                            <div id="password-strength-meter" class="strength-meter"></div>
-                            <div id="password-strength-text" class="small mt-1 text-dim" style="font-size: 0.7rem;"></div>
+                        <div class="mb-2 p-2 bg-light border rounded">
+                            <label class="small fw-bold text-dim mb-1">Passphrase Security Check</label>
+                            <input type="password" name="password" id="id_password" class="form-control input-light" placeholder="Enter Secure Password" required>
+                            
+                            <!-- Enhanced Strength Meter -->
+                            <div class="mt-2 text-center" style="font-size: 0.8rem;">
+                                <span id="password-strength-text" class="fw-bold text-muted">Awaiting Input...</span>
+                            </div>
+                            <div class="bg-secondary bg-opacity-10 mt-1 rounded" style="height: 10px; overflow: hidden; border: 1px solid #e2e8f0;">
+                                <div id="password-strength-meter" style="height: 100%; width: 0%; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
+                            </div>
+                            
+                            <!-- Visual Requirements List -->
+                            <div class="mt-2 row g-0 small text-dim" style="font-size: 0.65rem;">
+                                <div class="col-6" id="req-length"><i class="fas fa-circle me-1"></i> 8+ Characters</div>
+                                <div class="col-6" id="req-upper"><i class="fas fa-circle me-1"></i> Uppercase</div>
+                                <div class="col-6" id="req-number"><i class="fas fa-circle me-1"></i> Number</div>
+                                <div class="col-6" id="req-symbol"><i class="fas fa-circle me-1"></i> Symbol</div>
+                            </div>
                         </div>
-                        <button type="submit" id="submit-btn" class="btn btn-action w-100 mt-2 fw-bold">SAVE TO VAULT</button>
+                        <button type="submit" id="submit-btn" class="btn btn-action w-100 mt-2 fw-bold" disabled>
+                            <i class="fas fa-lock-open me-2"></i>SAVE TO VAULT
+                        </button>
+                        <div id="error-msg" class="text-danger small mt-2 text-center" style="display: none;">
+                            <i class="fas fa-exclamation-circle me-1"></i> Password too weak to save.
+                        </div>
                     </form>
                 </div>
             </div>
@@ -255,34 +282,77 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const passwordInput = document.getElementById('''id_password''');
-        const strengthMeter = document.getElementById('''password-strength-meter''');
-        const strengthText = document.getElementById('''password-strength-text''');
+        const passwordInput = document.getElementById('id_password');
+        const strengthMeter = document.getElementById('password-strength-meter');
+        const strengthText = document.getElementById('password-strength-text');
+        const submitBtn = document.getElementById('submit-btn');
+        const errorMsg = document.getElementById('error-msg');
 
-        passwordInput.addEventListener('''input''', function() {
+        // Requirements list icons
+        const reqs = {
+            length: document.getElementById('req-length'),
+            upper: document.getElementById('req-upper'),
+            number: document.getElementById('req-number'),
+            symbol: document.getElementById('req-symbol')
+        };
+
+        function updateRequirement(el, valid) {
+            if (valid) {
+                el.classList.remove('text-dim');
+                el.classList.add('text-success', 'fw-bold');
+                el.querySelector('i').className = 'fas fa-check-circle me-1';
+            } else {
+                el.classList.add('text-dim');
+                el.classList.remove('text-success', 'fw-bold');
+                el.querySelector('i').className = 'fas fa-circle me-1';
+            }
+        }
+
+        passwordInput.addEventListener('input', function() {
             const val = passwordInput.value;
             let strength = 0;
-            let feedback = [];
+            
+            const hasLength = val.length >= 8;
+            const hasUpper = /[A-Z]/.test(val);
+            const hasNumber = /[0-9]/.test(val);
+            const hasSymbol = /[^A-Za-z0-9]/.test(val);
 
-            if (val.length >= 8) strength += 25; else feedback.push('''Min 8 chars''');
-            if (/[A-Z]/.test(val)) strength += 25; else feedback.push('''Add uppercase''');
-            if (/[0-9]/.test(val)) strength += 25; else feedback.push('''Add number''');
-            if (/[^A-Za-z0-9]/.test(val)) strength += 25; else feedback.push('''Add symbol''');
+            if (hasLength) strength += 25;
+            if (hasUpper) strength += 25;
+            if (hasNumber) strength += 25;
+            if (hasSymbol) strength += 25;
+
+            updateRequirement(reqs.length, hasLength);
+            updateRequirement(reqs.upper, hasUpper);
+            updateRequirement(reqs.number, hasNumber);
+            updateRequirement(reqs.symbol, hasSymbol);
 
             strengthMeter.style.width = strength + "%";
             
-            if (strength <= 25) {
+            if (val.length === 0) {
+                strengthText.innerHTML = "Awaiting Input...";
+                strengthText.className = "fw-bold text-muted";
+                strengthMeter.style.backgroundColor = "transparent";
+                submitBtn.disabled = true;
+            } else if (strength <= 25) {
                 strengthMeter.style.backgroundColor = "#ef4444";
-                strengthText.innerHTML = "Weak: " + (feedback.join(", ") ; "Very short");
-                strengthText.className = "small mt-1 text-danger";
+                strengthText.innerHTML = "CRITICAL: INSECURE";
+                strengthText.className = "fw-bold text-danger";
+                submitBtn.disabled = true;
+                errorMsg.style.display = "block";
             } else if (strength <= 75) {
                 strengthMeter.style.backgroundColor = "#f59e0b";
-                strengthText.innerHTML = "Medium: " + feedback.join(", ");
-                strengthText.className = "small mt-1 text-warning";
+                strengthText.innerHTML = "WARNING: WEAK";
+                strengthText.className = "fw-bold text-warning";
+                submitBtn.disabled = true;
+                errorMsg.style.display = "block";
             } else {
                 strengthMeter.style.backgroundColor = "#22c55e";
-                strengthText.innerHTML = "Strong Password!";
-                strengthText.className = "small mt-1 text-success";
+                strengthText.innerHTML = "SECURE PASSCODE";
+                strengthText.className = "fw-bold text-success";
+                submitBtn.disabled = false;
+                errorMsg.style.display = "none";
+                submitBtn.innerHTML = '<i class="fas fa-lock me-2"></i>SAVE TO VAULT';
             }
         });
     </script>
