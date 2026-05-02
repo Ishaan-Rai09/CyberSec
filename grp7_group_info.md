@@ -60,9 +60,9 @@
 
 | Field             | Details                        |
 |-------------------|--------------------------------|
-| **Full Name**     | [Name Here]                    |
-| **Roll Number**   | [Roll Number]                  |
-| **GitHub Profile**| @[GitHub Handle]               |
+| **Full Name**     | Jyoti Dhamija                  |
+| **Roll Number**   | [2310991944]                   |
+| **GitHub Profile**| @[Jyotiiiiiiiii]               |
 | **Contribution**  | Created the Cybersecurity Lab Guide tutorial system and the reactive security status badges for the dashboard. |
 
 ---
@@ -74,7 +74,7 @@
 | **Full Name**     | [Krishiv]                      |
 | **Roll Number**   | [2310991961]                   |
 | **GitHub Profile**| @[Krishivdawra]                |
-| **Contribution**  | Managed the SQLite database schema design and implemented the AuditLog persistence and data retrieval logic. |
+| **Contribution**  |Handled user session management, routing logic for security toggles, and final project documentation/README preparation. |
 
 ---
 
@@ -82,10 +82,10 @@
 
 | Field             | Details                        |
 |-------------------|--------------------------------|
-| **Full Name**     | [Name Here]                    |
-| **Roll Number**   | [Roll Number]                  |
-| **GitHub Profile**| @[GitHub Handle]               |
-| **Contribution**  | Handled user session management, routing logic for security toggles, and final project documentation/README preparation. |
+| **Full Name**     | [Manav Taneja]                    |
+| **Roll Number**   | [2310991975]                  |
+| **GitHub Profile**| @[taneja-manav]               |
+| **Contribution**  | Managed the SQLite database schema design and implemented the AuditLog persistence and data retrieval logic.  |
 
 ---
 
